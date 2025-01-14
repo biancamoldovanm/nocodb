@@ -221,10 +221,9 @@ onUnmounted(() => {
     :closable="false"
     centered
     :footer="null"
-    :class="{ 'group': isExpandedFormOpen || isForm, 'nc-data-cell': isExpandedFormOpen }"
+    :class="{ 'group': isExpandedFormOpen || isForm, 'nc-data-cell': isExpandedFormOpen, 'json-modal min-w-80': isExpanded }"
     :wrap-class-name="isExpanded ? '!z-1051 nc-json-expanded-modal' : null"
     class="relative"
-    :class="{ 'json-modal min-w-80': isExpanded }"
   >
     <div v-if="isExpanded && !readOnly" class="flex flex-col w-full" @mousedown.stop @mouseup.stop @click.stop>
       <div class="flex flex-row justify-between items-center -mt-2 pb-2 nc-json-action" @mousedown.stop>
