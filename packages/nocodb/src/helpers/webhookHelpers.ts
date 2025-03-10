@@ -434,7 +434,7 @@ export function constructWebHookData(hook, model, view, prevData, newData) {
   return newData;
 }
 
-function populateAxiosReq({
+async function populateAxiosReq({
   apiMeta: _apiMeta,
   hook,
   model,
@@ -762,7 +762,7 @@ export async function invokeWebhook(
         break;
       case 'URL':
         {
-          reqPayload = populateAxiosReq({
+          reqPayload = await populateAxiosReq({
             apiMeta: notification?.payload,
             user,
             hook,
