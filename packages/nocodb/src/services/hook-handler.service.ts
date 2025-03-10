@@ -6,7 +6,10 @@ import type { FormColumnType, HookType } from 'nocodb-sdk';
 import type { ColumnType } from 'nocodb-sdk';
 import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import NcPluginMgrv2 from '~/helpers/NcPluginMgrv2';
-import { _transformSubmittedFormDataForEmail } from '~/helpers/webhookHelpers';
+import {
+  _transformSubmittedFormDataForEmail,
+  getAffectedColumns,
+} from '~/helpers/webhookHelpers';
 import { IEventEmitter } from '~/modules/event-emitter/event-emitter.interface';
 import formSubmissionEmailTemplate from '~/utils/common/formSubmissionEmailTemplate';
 import { FormView, Hook, Model, View } from '~/models';
@@ -115,6 +118,12 @@ export class HookHandlerService implements OnModuleInit, OnModuleDestroy {
       fk_model_id: modelId,
       event: event as HookType['event'],
       operation: operation as HookType['operation'][0],
+      affectedColumns: await getAffectedColumns(context, {
+        hookName,
+        newData,
+        prevData,
+        model,
+      }),
     });
     for (const hook of hooks) {
       if (hook.active) {

@@ -15,6 +15,7 @@ import type {
   HookLogType,
   HookType,
   TableType,
+  UpdatePayload,
   UserType,
   ViewType,
 } from 'nocodb-sdk';
@@ -23,7 +24,7 @@ import type { NcContext } from '~/interface/config';
 import { Filter, HookLog, Source } from '~/models';
 import { filterBuilder } from '~/utils/api-v3-data-transformation.builder';
 import { addDummyRootAndNest } from '~/services/v3/filters-v3.service';
-import { isEE } from '~/utils';
+import { isEE, populateUpdatePayloadDiff } from '~/utils';
 
 for (const moduleName of [
   'array',
@@ -961,4 +962,54 @@ export function compareOperationCode(param: {
     (HookOperationCode[param.operation] & numberCode) ===
     HookOperationCode[param.operation]
   );
+}
+
+export async function getAffectedColumns(
+  context: NcContext,
+  {
+    hookName,
+    prevData,
+    newData,
+    model,
+  }: {
+    hookName: string;
+    prevData: any;
+    newData: any;
+    model: Model;
+  },
+) {
+  if (hookName !== 'after.update') {
+    return undefined;
+  }
+  let affectedCols = [];
+  if (typeof prevData === 'undefined' || prevData === null) {
+    return undefined;
+  }
+  const compareSingle = (prev, next) => {
+    const updatePayload = populateUpdatePayloadDiff({
+      prev,
+      next,
+    }) as UpdatePayload;
+    if (updatePayload) {
+      affectedCols = affectedCols.concat(
+        Object.keys(updatePayload.modifications),
+      );
+    }
+  };
+  if (Array.isArray(prevData)) {
+    for (let i = 0; i < prevData.length; i++) {
+      compareSingle(prevData[i], newData[i]);
+    }
+  } else {
+    compareSingle(prevData, newData);
+  }
+  if (affectedCols.length) {
+    affectedCols = [...new Set(affectedCols)];
+    const columns = await model.getColumns(context);
+    return affectedCols.map(
+      (title) => columns.find((col) => col.title === title).id,
+    );
+  } else {
+    return undefined;
+  }
 }
