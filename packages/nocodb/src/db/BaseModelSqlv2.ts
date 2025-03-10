@@ -7233,7 +7233,7 @@ class BaseModelSqlv2 implements IBaseModelSqlV2 {
       NcError.badRequest('Cannot insert into synced table');
     }
 
-    await this.handleHooks('before.bulkInsert', null, data, req);
+    await this.handleHooks('before.insert', null, data, req);
   }
 
   public async afterInsert({
@@ -7286,7 +7286,7 @@ class BaseModelSqlv2 implements IBaseModelSqlV2 {
   }
 
   public async afterBulkInsert(data: any[], _trx: any, req): Promise<void> {
-    await this.handleHooks('after.bulkInsert', null, data, req);
+    await this.handleHooks('after.insert', null, data, req);
     let parentAuditId;
 
     // disable external source audit in cloud
@@ -7393,7 +7393,7 @@ class BaseModelSqlv2 implements IBaseModelSqlV2 {
     isBulkAllOperation = false,
   ): Promise<void> {
     if (!isBulkAllOperation) {
-      await this.handleHooks('after.bulkDelete', null, data, req);
+      await this.handleHooks('after.delete', null, data, req);
     }
 
     const parentAuditId = await Noco.ncMeta.genNanoid(MetaTable.AUDIT);
@@ -7460,7 +7460,7 @@ class BaseModelSqlv2 implements IBaseModelSqlV2 {
     isBulkAllOperation = false,
   ): Promise<void> {
     if (!isBulkAllOperation) {
-      await this.handleHooks('after.bulkUpdate', prevData, newData, req);
+      await this.handleHooks('after.update', prevData, newData, req);
     }
 
     if (newData && newData.length > 0) {
