@@ -30,7 +30,7 @@ const editable = inject(EditModeInj, ref(false))
 
 const isGrid = inject(IsGridInj, ref(false))
 
-const canvasSelectCell = inject(CanvasSelectCellInj)
+const canvasSelectCell = inject(CanvasSelectCellInj, null)
 
 const isForm = inject(IsFormInj, ref(false))
 
@@ -52,7 +52,7 @@ const open = ref<boolean>(false)
 
 const tempDate = ref<dayjs.Dayjs | undefined>()
 
-const canvasCellEventData = inject(CanvasCellEventDataInj)!
+const canvasCellEventData = inject(CanvasCellEventDataInj, reactive<CanvasCellEventDataInjType>({}))
 
 const localState = computed({
   get() {

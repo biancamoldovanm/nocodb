@@ -40,11 +40,11 @@ const cellEventHook = inject(CellEventHookInj, null)
 
 const readOnly = computed(() => readOnlyInj.value || column.value.readonly)
 
-const canvasCellEventData = inject(CanvasCellEventDataInj)!
+const canvasCellEventData = inject(CanvasCellEventDataInj, reactive<CanvasCellEventDataInjType>({}))
 const isCanvasInjected = inject(IsCanvasInjectionInj, false)
 const clientMousePosition = inject(ClientMousePositionInj)
 const isUnderLookup = inject(IsUnderLookupInj, ref(false))
-const canvasSelectCell = inject(CanvasSelectCellInj)
+const canvasSelectCell = inject(CanvasSelectCellInj, null)
 
 const { showNull, user } = useGlobal()
 
@@ -389,7 +389,7 @@ onMounted(() => {
   if (isUnderLookup.value || !isCanvasInjected || !clientMousePosition || isExpandedFormOpen.value) return
   const position = { clientX: clientMousePosition.clientX, clientY: clientMousePosition.clientY + 2 }
   forcedNextTick(() => {
-    if (onCellEvent(canvasCellEventData?.event)) return
+    if (onCellEvent(canvasCellEventData.event)) return
 
     if (getElementAtMouse('.nc-canvas-table-editable-cell-wrapper .nc-textarea-expand', position)) {
       onExpand()
