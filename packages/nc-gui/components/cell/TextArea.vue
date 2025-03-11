@@ -384,7 +384,7 @@ const onCellEvent = (event?: Event) => {
 }
 
 onMounted(() => {
-  cellEventHook?.off(onCellEvent)
+  cellEventHook?.on(onCellEvent)
 
   if (isUnderLookup.value || !isCanvasInjected || !clientMousePosition || isExpandedFormOpen.value) return
   const position = { clientX: clientMousePosition.clientX, clientY: clientMousePosition.clientY + 2 }
