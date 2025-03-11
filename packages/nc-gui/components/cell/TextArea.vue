@@ -36,8 +36,11 @@ const readOnlyInj = inject(ReadonlyInj, ref(false))
 
 const isUnderFormula = inject(IsUnderFormulaInj, ref(false))
 
+const cellEventHook = inject(CellEventHookInj, null)
+
 const readOnly = computed(() => readOnlyInj.value || column.value.readonly)
 
+const canvasCellEventData = inject(CanvasCellEventDataInj)!
 const isCanvasInjected = inject(IsCanvasInjectionInj, false)
 const clientMousePosition = inject(ClientMousePositionInj)
 const isUnderLookup = inject(IsUnderLookupInj, ref(false))
@@ -366,10 +369,30 @@ watch(textAreaRef, (el) => {
   }
 })
 
+const onCellEvent = (event?: Event) => {
+  if (!(event instanceof KeyboardEvent)) return
+
+  if (event.key === ' ' && event.shiftKey) {
+    if (isVisible.value) {
+      handleClose()
+    } else {
+      onExpand()
+    }
+
+    return true
+  }
+}
+
 onMounted(() => {
+  cellEventHook?.off(onCellEvent)
+
   if (isUnderLookup.value || !isCanvasInjected || !clientMousePosition || isExpandedFormOpen.value) return
   const position = { clientX: clientMousePosition.clientX, clientY: clientMousePosition.clientY + 2 }
   forcedNextTick(() => {
+    const event = canvasCellEventData?.event
+
+    if (onCellEvent(event)) return
+
     if (getElementAtMouse('.nc-canvas-table-editable-cell-wrapper .nc-textarea-expand', position)) {
       onExpand()
     } else if (getElementAtMouse('.nc-canvas-table-editable-cell-wrapper .nc-textarea-generate', position)) {
@@ -378,6 +401,10 @@ onMounted(() => {
       onExpand()
     }
   })
+})
+
+onUnmounted(() => {
+  cellEventHook?.off(onCellEvent)
 })
 </script>
 
